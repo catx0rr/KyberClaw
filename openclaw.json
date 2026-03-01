@@ -1,0 +1,288 @@
+{
+  "gateway": {
+    "mode": "local",
+    "port": 18789,
+    "bind": "loopback",
+    "controlUi": { "enabled": false },
+    "auth": {
+      "mode": "token",
+      "token": "${OPENCLAW_GATEWAY_TOKEN}"
+    }
+  },
+
+  "env": {
+    "shellEnv": { "enabled": true }
+  },
+
+  "agents": {
+    "defaults": {
+      "workspace": "~/.openclaw/workspace",
+      "bootstrapMaxChars": 60000,
+      "bootstrapTotalMaxChars": 150000,
+      "userTimezone": "Asia/Manila",
+      "heartbeat": {
+        "every": "30m",
+        "target": "none",
+        "activeHours": "00:00-23:59"
+      },
+      "thinking": "disabled",
+      "compaction": {
+        "mode": "safeguard"
+      },
+      "contextPruning": {
+        "mode": "cache-ttl"
+      },
+      "bootstrap": {
+        "files": [
+          "SOUL.md",
+          "PRINCIPLES.md",
+          "IDENTITY.md",
+          "AGENTS.md",
+          "TOOLS.md",
+          "USER.md",
+          "MEMORY.md",
+          "ENGAGEMENT.md",
+          "HEARTBEAT.md"
+        ]
+      },
+      "models": {
+        "anthropic/claude-sonnet-4-6": {
+          "alias": "sonnet",
+          "params": {
+            "cacheRetention": "short"
+          }
+        },
+        "anthropic/claude-opus-4-6": {
+          "alias": "opus",
+          "params": {
+            "cacheRetention": "short"
+          }
+        },
+        "anthropic/claude-haiku-4-5": {
+          "alias": "haiku",
+          "params": {
+            "cacheRetention": "short"
+          }
+        }
+      },
+      "subagents": {
+        "maxSpawnDepth": 1,
+        "maxChildrenPerAgent": 3,
+        "maxConcurrent": 6,
+        "runTimeoutSeconds": 1800,
+        "thinking": "disabled"
+      }
+    },
+    "list": [
+      {
+        "id": "zero",
+        "default": true,
+        "workspace": "~/.openclaw/workspace",
+        "model": {
+          "primary": "anthropic/claude-sonnet-4-6",
+          "fallbacks": [
+            "minimax/MiniMax-M2.5",
+            "synthetic/hf:zai-org/GLM-4.7"
+          ]
+        },
+        "identity": {
+          "name": "Zero",
+          "emoji": "🕵️"
+        }
+      },
+      {
+        "id": "recon",
+        "workspace": "~/.openclaw/workspace",
+        "model": {
+          "primary": "minimax/MiniMax-M2.5-Lightning",
+          "fallbacks": [
+            "anthropic/claude-haiku-4-5",
+            "synthetic/hf:zai-org/GLM-4.7"
+          ]
+        }
+      },
+      {
+        "id": "access",
+        "workspace": "~/.openclaw/workspace",
+        "model": {
+          "primary": "minimax/MiniMax-M2.5",
+          "fallbacks": [
+            "anthropic/claude-sonnet-4-6",
+            "synthetic/hf:zai-org/GLM-4.7"
+          ]
+        }
+      },
+      {
+        "id": "exploit",
+        "workspace": "~/.openclaw/workspace",
+        "model": {
+          "primary": "anthropic/claude-sonnet-4-6",
+          "fallbacks": [
+            "minimax/MiniMax-M2.5",
+            "synthetic/hf:zai-org/GLM-4.7"
+          ]
+        }
+      },
+      {
+        "id": "attack",
+        "workspace": "~/.openclaw/workspace",
+        "model": {
+          "primary": "anthropic/claude-sonnet-4-6",
+          "fallbacks": [
+            "minimax/MiniMax-M2.5",
+            "synthetic/hf:zai-org/GLM-4.7"
+          ]
+        }
+      },
+      {
+        "id": "report",
+        "workspace": "~/.openclaw/workspace",
+        "model": {
+          "primary": "anthropic/claude-opus-4-6",
+          "fallbacks": [
+            "anthropic/claude-sonnet-4-6",
+            "minimax/MiniMax-M2.5"
+          ]
+        }
+      },
+      {
+        "id": "monitor",
+        "workspace": "~/.openclaw/workspace",
+        "model": {
+          "primary": "synthetic/hf:zai-org/GLM-4.7"
+        },
+        "heartbeat": {
+          "every": "55m"
+        }
+      },
+      {
+        "id": "ext-recon",
+        "workspace": "~/.openclaw/workspace",
+        "model": {
+          "primary": "minimax/MiniMax-M2.5-Lightning",
+          "fallbacks": [
+            "anthropic/claude-haiku-4-5",
+            "synthetic/hf:zai-org/GLM-4.7"
+          ]
+        }
+      },
+      {
+        "id": "ext-vuln",
+        "workspace": "~/.openclaw/workspace",
+        "model": {
+          "primary": "anthropic/claude-sonnet-4-6",
+          "fallbacks": [
+            "minimax/MiniMax-M2.5",
+            "synthetic/hf:zai-org/GLM-4.7"
+          ]
+        }
+      },
+      {
+        "id": "ext-exploit",
+        "workspace": "~/.openclaw/workspace",
+        "model": {
+          "primary": "anthropic/claude-sonnet-4-6",
+          "fallbacks": [
+            "minimax/MiniMax-M2.5",
+            "synthetic/hf:zai-org/GLM-4.7"
+          ]
+        }
+      }
+    ]
+  },
+
+  "models": {
+    "mode": "merge",
+    "providers": {
+      "minimax": {
+        "baseUrl": "https://api.minimax.io/anthropic",
+        "apiKey": "${MINIMAX_API_KEY}",
+        "api": "anthropic-messages",
+        "models": [
+          {
+            "id": "MiniMax-M2.5",
+            "name": "MiniMax M2.5",
+            "reasoning": false,
+            "input": ["text"],
+            "cost": { "input": 15, "output": 120, "cacheRead": 2, "cacheWrite": 10 },
+            "contextWindow": 204000,
+            "maxTokens": 8192
+          },
+          {
+            "id": "MiniMax-M2.5-Lightning",
+            "name": "MiniMax M2.5 Lightning",
+            "reasoning": false,
+            "input": ["text"],
+            "cost": { "input": 30, "output": 240, "cacheRead": 3, "cacheWrite": 20 },
+            "contextWindow": 204000,
+            "maxTokens": 8192
+          }
+        ]
+      },
+      "synthetic": {
+        "baseUrl": "https://api.synthetic.new/anthropic",
+        "apiKey": "${SYNTHETIC_API_KEY}",
+        "api": "anthropic-messages",
+        "models": [
+          {
+            "id": "hf:zai-org/GLM-4.7",
+            "name": "GLM-4.7",
+            "reasoning": false,
+            "input": ["text"],
+            "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
+            "contextWindow": 198000,
+            "maxTokens": 128000
+          }
+        ]
+      }
+    }
+  },
+
+  "channels": {
+    "defaults": {
+      "groupPolicy": "disabled"
+    },
+    "whatsapp": {
+      "dmPolicy": "allowlist",
+      "allowFrom": [],
+      "textChunkLimit": 4000,
+      "chunkMode": "length",
+      "mediaMaxMb": 50,
+      "sendReadReceipts": true,
+      "groups": {
+        "*": {
+          "requireMention": true
+        }
+      },
+      "groupPolicy": "disabled"
+    }
+  },
+
+  "messages": {
+    "groupChat": {
+      "mentionPatterns": ["@zero", "zero"]
+    }
+  },
+
+  "hooks": {
+    "enabled": true,
+    "mappings": []
+  },
+
+  "tools": {
+    "profile": "coding",
+    "web": {
+      "search": { "enabled": true },
+      "fetch": { "enabled": true }
+    }
+  },
+
+  "session": {
+    "scope": "per-sender",
+    "dmScope": "main"
+  },
+
+  "logging": {
+    "level": "info"
+  }
+}
