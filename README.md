@@ -146,4 +146,4 @@ This tool does not perform any testing autonomously without operator confirmatio
 
 ## License
 
-This project is proprietary. All rights reserved.
+MIT, Apache 2.0, BSD All rights reserved.
